@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
     const userData = await Driver.findOne({ phone });
 
     if (!userData) {
-      return NextResponse.json({ msg: "Invalid credentials" }, { status: 400 });
+      return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
     }
 
     //check if password is correct
     const validPassword = await bcrypt.compare(password, userData.password);
     if (!validPassword) {
-      return NextResponse.json({ msg: "Invalid credentials" }, { status: 400 });
+      return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
     }
 
     //create token data
@@ -61,6 +61,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (err: any) {
     console.error(err.message);
-    return NextResponse.json({ msg: err.message }, { status: 500 });
+    return NextResponse.json({ message: err.message }, { status: 500 });
   }
 }

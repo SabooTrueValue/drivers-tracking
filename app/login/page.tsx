@@ -57,36 +57,14 @@ const Login: React.FC = () => {
 
           window.location.href = "/profile";
         } else {
-          toast.error("Login failed");
+           
+          toast.error(res.message);
           console.log(res);
         }
-        // const response = await axios.post("http://localhost:8000/login", {
-        //   phone: values.phone,
-        //   password: values.password,
-        // });
-
-        // console.log("API response:", response.data.data.message);
-        // if (response.data.status === true) {
-        //   toast.success("Login successful!");
-        //   //   cookies().set("token", response.data.token, { expires: 7 }); // Expires in 7 days
-        //   //   cookies().set("_id", response.data.data._id, { expires: 7 }); // Expires in 7 days
-        //   localStorage.setItem("token", response.data.token);
-        //   localStorage.setItem("_id", response.data.data._id);
-        //   resetForm();
-        // //   router.push("/profile");
-        //   window.location.href = "/profile";
-        // } else {
-        //   toast.error("Failed to login. Please try again.");
-        // }
+       
       } catch (error: any) {
         console.error("Error logging in:", error);
-        if (error.response.data.message === "Password is incorrect") {
-          toast.error("Password is incorrect");
-        } else if (error.response.data.message === "User not found") {
-          toast.error("User not found");
-        } else {
-          toast.error("Failed to login. Please try again.");
-        }
+        toast.error("Login failed");
       }
     },
   });
