@@ -1,0 +1,183 @@
+"use client";
+import React, { useState } from "react";
+import { VscEye, VscEyeClosed } from "react-icons/vsc";
+import { useFormik, FormikHelpers } from "formik";
+import * as Yup from "yup";
+// import axios from "axios";
+import toast from "react-hot-toast";
+import Image from "next/image";
+// import { useRouter } from "next/navigation";
+
+interface Values {
+  phone: string;
+  password: string;
+}
+
+const Login: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  //   const router = useRouter();
+  const formik = useFormik<Values>({
+    initialValues: {
+      phone: "",
+      password: "",
+    },
+    validationSchema: Yup.object({
+      phone: Yup.string()
+        .required("Phone number is required")
+        .matches(
+          /^[6-9]\d{9}$/,
+          "Phone number must be a 10-digit Indian number"
+        ),
+      password: Yup.string()
+        .min(4, "Password must be at least 4 characters")
+        .required("Password is required"),
+    }),
+    onSubmit: async (values: Values, { resetForm }: FormikHelpers<Values>) => {
+      try {
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        };
+        const res = await (await fetch("/api/driver/login", options)).json();
+        // .then((res) => res.json())
+        // .then((data) => {
+        //   console.log(data);
+        // });
+        //  const res = await axios.post("/api/driver/login", values);
+        if (res.status === "success") {
+          toast.success("Login successful");
+          //   cookies().set("token", response.data.token, { expires: 7 }); // Expires in 7 days
+
+          console.log(res);
+
+          resetForm();
+
+          window.location.href = "/profile";
+        } else {
+          toast.error("Login failed");
+          console.log(res);
+        }
+        // const response = await axios.post("http://localhost:8000/login", {
+        //   phone: values.phone,
+        //   password: values.password,
+        // });
+
+        // console.log("API response:", response.data.data.message);
+        // if (response.data.status === true) {
+        //   toast.success("Login successful!");
+        //   //   cookies().set("token", response.data.token, { expires: 7 }); // Expires in 7 days
+        //   //   cookies().set("_id", response.data.data._id, { expires: 7 }); // Expires in 7 days
+        //   localStorage.setItem("token", response.data.token);
+        //   localStorage.setItem("_id", response.data.data._id);
+        //   resetForm();
+        // //   router.push("/profile");
+        //   window.location.href = "/profile";
+        // } else {
+        //   toast.error("Failed to login. Please try again.");
+        // }
+      } catch (error: any) {
+        console.error("Error logging in:", error);
+        if (error.response.data.message === "Password is incorrect") {
+          toast.error("Password is incorrect");
+        } else if (error.response.data.message === "User not found") {
+          toast.error("User not found");
+        } else {
+          toast.error("Failed to login. Please try again.");
+        }
+      }
+    },
+  });
+
+  return (
+    <main className="w-full h-screen bg-[#6C63FF]">
+      <div className="h-full overflow-hidden">
+        <div className="w-full h-full p-6 pt-24 mt-24 bg-white rounded-lg md:p-8 rounded-t-3xl lg:flex lg:flex-col lg:justify-center lg:mt-16">
+          <Image
+            src="/logo.png"
+            alt="saboo_rks_logo"
+            width={300}
+            height={300}
+            className="mx-auto mb-6 h-auto w-auto"
+          />
+          <form
+            onSubmit={formik.handleSubmit}
+            className="w-full max-w-md mx-auto"
+          >
+            <div className="mb-6">
+              <label className="block mb-2 text-sm" htmlFor="phone">
+                Phone Number*
+              </label>{" "}
+              <input
+                className={`appearance-none w-full py-2.5 leading-tight focus:outline-none focus:shadow-outline bg-none border-b-2 text-sm bg-transparent border-b-black focus:bg-transparent px-0.5 ${
+                  formik.touched.phone && formik.errors.phone
+                    ? "border-red-500 text-red-600"
+                    : "text-gray-900"
+                }`}
+                id="phone"
+                type="text"
+                maxLength={10}
+                minLength={10}
+                autoComplete="off"
+                {...formik.getFieldProps("phone")}
+                placeholder="Enter your phone number"
+              />
+              {formik.touched.phone && formik.errors.phone ? (
+                <div className="mt-1 text-sm text-red-500">
+                  {formik.errors.phone}
+                </div>
+              ) : null}
+            </div>
+            <div className="relative mb-8">
+              <label className="block mb-2 text-sm" htmlFor="password">
+                Password
+              </label>
+              <input
+                className={`appearance-none w-full py-2.5 leading-tight focus:outline-none focus:shadow-outline bg-none border-b-2 text-sm bg-transparent border-b-black px-0.5 ${
+                  formik.touched.password && formik.errors.password
+                    ? "border-red-500 text-red-600"
+                    : "text-gray-700"
+                }`}
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...formik.getFieldProps("password")}
+                placeholder="Enter your password"
+              />
+              <div
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-0 flex items-center pr-3 text-lg leading-5 cursor-pointer top-9"
+              >
+                {showPassword ? (
+                  <VscEye className="text-gray-800" />
+                ) : (
+                  <VscEyeClosed className="text-gray-800" />
+                )}
+              </div>
+              {formik.touched.password && formik.errors.password ? (
+                <div className="mt-1 text-sm text-red-500">
+                  {formik.errors.password}
+                </div>
+              ) : null}
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                className="w-full p-4 text-white bg-[#6C63FF] rounded-lg select-none focus:outline-none focus:shadow-outline"
+                type="submit"
+                disabled={formik.isSubmitting}
+              >
+                {formik.isSubmitting ? "Submitting..." : "Login"}
+              </button>
+            </div>
+            <p className="pt-4 text-xs text-center">
+              Don&apos;t have an account? <br /> Contact your Branch Manager
+            </p>
+          </form>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default Login;
