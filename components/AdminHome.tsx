@@ -23,7 +23,7 @@ const Section1 = () => {
         <div className="p-2 rounded-lg bg-gray-50 lg:px-4">
           <p className="text-sm ">Drive Statistic:</p>
           <p>
-            <span className="text-lg font-medium ">Today's Drive: </span>{" "}
+            <span className="text-lg font-medium ">Today&apos;s Drive: </span>{" "}
             <span className="text-xl text-gray-800"> 4 </span>
           </p>
           <p>
