@@ -88,17 +88,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "No users found" }, { status: 404 });
     }
 
-    const journeyData = await Journey.find({ driversId: driverId }).sort({
-      createdAt: -1,
-    });
+    // const journeyData = await Journey.find({ driversId: driverId }).sort({
+    //   createdAt: -1,
+    // });
 
-    console.log(journeyData);
+    // console.log(journeyData);
 
     // Return users with success status
-    return NextResponse.json(
-      { data, journeyData, message: "success" },
-      { status: 200 }
-    );
+    return NextResponse.json({ data, message: "success" }, { status: 200 });
   } catch (error) {
     // Handle any errors that occur during database query or processing
     console.error("Error in GET request:", error);

@@ -7,69 +7,21 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { IoIosLogOut } from "react-icons/io";
 import Cookies from "js-cookie";
+import { useAppContext } from "@/context";
 
 const Home: React.FC = () => {
   // const { driverData, setDriverData } = useData();
-  interface DriverData {
-    isDriving: boolean;
-    _id: string;
-    name: string;
-    employeeId: string;
-    phone: string;
-    // Add other properties as needed
-  }
-
-  interface Location {
-    time: string;
-    date: string;
-    formattedLocation: string;
-    lat: number;
-    lng: number;
-    detail: string;
-  }
-
-  interface JourneyData {
-    vehicleNumber: string;
-    date: string;
-    time: string;
-    status: string;
-    location: Location[];
-    createdAt: Date;
-    updatedAt: Date;
-    // Add other properties as needed
-  }
-
-  const [journyData, setJournyData] = useState<JourneyData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isDriving, setIsDriving] = useState(false);
-  const [driverData, setDriverData] = useState<DriverData | null>(null);
-
-  useEffect(() => {
-    const getDriverData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`/api/driver/user`);
-        console.log(response.data?.data);
-        setDriverData(response.data?.data);
-        // setJournyData(response.data.journy);
-        setIsDriving(response.data.isDriving);
-        if (response.data?.journeyData?.length > 0) {
-          setJournyData(response.data?.journeyData);
-        }
-        console.log(
-          "🚀 ~ file: page.tsx:Home ~ getDriverData ~ response.data:",
-          response.data
-        );
-      } catch (error: any) {
-        console.error("Error fetching data in:", error);
-        toast.error("Profile not found");
-        window.location.href = "/login";
-      } finally {
-        setLoading(false);
-      }
-    };
-    getDriverData();
-  }, []);
+  const {
+    driverData,
+    setDriverData,
+    journyData,
+    setJournyData,
+    isDriving,
+    setIsDriving,
+    getDriverData,
+    journeyData,
+  } = useAppContext();
 
   useEffect(() => {
     setIsDriving(driverData?.isDriving ?? false);
@@ -96,6 +48,7 @@ const Home: React.FC = () => {
           detail: "Starting trip",
         });
 
+        resetForm();
         // Example API call
         // const response = await axios.post("http://localhost:8000/login", {
         //   phone: values.phone,
@@ -306,30 +259,9 @@ const Home: React.FC = () => {
 
       if (response.data.status === true) {
         toast.success("Driving status updated successfully.");
-        const getDriverData = async () => {
-          try {
-            setLoading(true);
-            const response = await axios.get(`/api/driver/user`);
-            console.log(response.data?.data);
-            setDriverData(response.data?.data);
-            // setJournyData(response.data.journy);
-            setIsDriving(response.data.isDriving);
-            if (response.data?.journeyData?.length > 0) {
-              setJournyData(response.data?.journeyData);
-            }
-            console.log(
-              "🚀 ~ file: page.tsx:Home ~ getDriverData ~ response.data:",
-              response.data
-            );
-          } catch (error: any) {
-            console.error("Error fetching data in:", error);
-            toast.error("Profile not found");
-            window.location.href = "/login";
-          } finally {
-            setLoading(false);
-          }
-        };
+
         getDriverData();
+        journeyData();
       } else {
         toast.error("Failed to end journey. Please try again later.");
       }
@@ -482,7 +414,7 @@ const Home: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between pt-4">
-                    { driverData && (
+                    {driverData && (
                       <button
                         className="w-full h-full p-4 text-white bg-green-600 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg text-center"
                         type="submit"
@@ -571,7 +503,7 @@ const Home: React.FC = () => {
 
               {journyData.length > 0 ? (
                 <div className="flex flex-col gap-4 pt-4 md:flex-wrap md:flex-row ">
-                  {journyData.map((journey, index) => (
+                  {journyData.map((journey: any, index: number) => (
                     <div
                       key={index}
                       className="max-h-[50vh] p-4  bg-white border rounded-lg shadow-sm shadow-black/50 relative max-w-sm"
@@ -587,7 +519,7 @@ const Home: React.FC = () => {
                         </p>
                       </div>
 
-                      {journey.location.map((loc, index) => (
+                      {journey.location.map((loc: any, index: any) => (
                         <div key={index} className="flex gap-1 -mt-1 ">
                           <div className="flex flex-col items-center justify-start w-4 pt-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full" />

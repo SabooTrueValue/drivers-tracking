@@ -3,10 +3,11 @@ import Driver from "@/models/driverModel";
 import Journey from "@/models/modelJourny";
 import moment from "moment";
 import "moment-timezone";
+import mongoose from "mongoose";
 moment.tz.setDefault("Asia/Kolkata");
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
+connectDB();
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     await connectDB();
@@ -34,7 +35,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     data.location[0].date = date;
 
     const driverId = cookies().get("_id")?.value;
-    
 
     //check if user exists
     let saveData = await Journey.create(data);
@@ -155,5 +155,48 @@ export async function PUT(req: NextRequest, res: NextResponse) {
   } catch (err: any) {
     console.error(err.message);
     return NextResponse.json({ message: err.message }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    interface Values {
+      _id?: string | mongoose.Types.ObjectId;
+      isDeleted: boolean;
+    }
+    // Initialize filter to find non-deleted users
+    let filter: Values = { isDeleted: false };
+
+    // Extract query parameters from req.url
+    // const queryParams = new URLSearchParams(req.url.split("?")[1]);
+    const driverId = cookies().get("_id")?.value;
+
+    // Check if driverId query parameter is provided
+    if (driverId) {
+      filter._id = driverId;
+    }
+
+    // Query database for users based on filter
+
+    // Check if users are found
+
+    const journeyData = await Journey.find({ driversId: driverId }).sort({
+      createdAt: -1,
+    });
+
+    console.log(journeyData);
+
+    // Return users with success status
+    return NextResponse.json(
+      { data: journeyData, message: "success" },
+      { status: 200 }
+    );
+  } catch (error) {
+    // Handle any errors that occur during database query or processing
+    console.error("Error in GET request:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
