@@ -89,6 +89,6 @@ const journeySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const JournyModel = mongoose.models.journyDetails || mongoose.model("journyDetails", journeySchema);
+const JourneyModel = mongoose.models.journeyDetails || mongoose.model("journeyDetails", journeySchema);
 
-export default JournyModel;
+export default JourneyModel;

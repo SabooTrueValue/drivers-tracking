@@ -71,8 +71,12 @@ const Login: React.FC = () => {
 
   return (
     <main className="w-full h-screen bg-[#6C63FF]">
-      <div className="h-full overflow-hidden">
-        <div className="w-full h-full p-6 pt-24 mt-24 bg-white rounded-lg md:p-8 rounded-t-3xl lg:flex lg:flex-col lg:justify-center lg:mt-16">
+    
+        <p className="flex  text-3xl md:text-4xl text-white py-10 px-2">
+          Login Page
+        </p>
+        
+        <div className="w-full h-full px-6 pb-10  pt-20  bg-white rounded-lg rounded-t-3xl lg:flex lg:flex-col lg:justify-center lg:mt-16">
           <Image
             src="/logo.png"
             alt="saboo_rks_logo"
@@ -153,7 +157,7 @@ const Login: React.FC = () => {
             </p>
           </form>
         </div>
-      </div>
+      
     </main>
   );
 };

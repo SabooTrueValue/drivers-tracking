@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 
 // connectDB();
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
     await connectDB();
     const reqBody = await req.json();
@@ -23,13 +23,19 @@ export async function POST(req: NextRequest) {
     const userData = await Driver.findOne({ phone });
 
     if (!userData) {
-      return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid credentials" },
+        { status: 400 }
+      );
     }
 
     //check if password is correct
     const validPassword = await bcrypt.compare(password, userData.password);
     if (!validPassword) {
-      return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid credentials" },
+        { status: 400 }
+      );
     }
 
     //create token data
@@ -46,6 +52,12 @@ export async function POST(req: NextRequest) {
 
     const expireDuration = new Date(Date.now() + 12 * 60 * 60 * 1000);
     const cookieString = `token=${token}; expires = ${expireDuration}; path=/;`;
+    const cookieString2 = `_id=${userData._id}; expires = ${expireDuration}; path=/;`;
+
+    const newHeader = new Headers(res.headers);
+    newHeader.set("set-cookie", cookieString);
+
+    newHeader.append("set-cookie", cookieString2);
 
     return NextResponse.json(
       {
@@ -54,9 +66,7 @@ export async function POST(req: NextRequest) {
         message: "Login successful",
       },
       {
-        headers: {
-          "set-cookie": cookieString,
-        },
+        headers: newHeader,
       }
     );
   } catch (err: any) {

@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MdOutlineNavigateNext } from "react-icons/md";
+import Cookies from "js-cookie";
 
 export default function Home() {
   const [showVehicle, setShowVehicle] = useState(false);
+  const token = Cookies.get("token");
 
   useEffect(() => {
     setTimeout(() => {
@@ -33,14 +35,8 @@ export default function Home() {
             </p>
             <p className="py-4">Your journey starts here</p>
             <Link
-              href={"/login"}
-              // onClick={() => {
-              //   if (driverData) {
-              //     setSteps(2);
-              //   } else {
-              //     setSteps(1);
-              //   }
-              // }}
+              href={token ? "/profile" : "/login"}
+             
               className="flex items-center justify-center w-16 h-16 mx-auto mb-4 text-white uppercase bg-[#6C63FF] rounded-full shadow-sm ring-2 ring-offset-4 ring-violet-300 "
             >
               <MdOutlineNavigateNext className="text-5xl animate-pulse" />
