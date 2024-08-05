@@ -19,26 +19,26 @@ const Home: React.FC = () => {
     // Add other properties as needed
   }
 
-interface Location {
-  time: string;
-  date: string;
-  formattedLocation: string;
-  lat: number;
-  lng: number;
-  detail: string;
-}
+  interface Location {
+    time: string;
+    date: string;
+    formattedLocation: string;
+    lat: number;
+    lng: number;
+    detail: string;
+  }
 
-interface JourneyData {
-  vehicleNumber: string;
-  date: string;
-  time: string;
-  location: Location[];
-  createdAt: Date;
-  updatedAt: Date;
-  // Add other properties as needed
-}
+  interface JourneyData {
+    vehicleNumber: string;
+    date: string;
+    time: string;
+    location: Location[];
+    createdAt: Date;
+    updatedAt: Date;
+    // Add other properties as needed
+  }
 
- const [journyData, setJournyData] = useState<JourneyData[]>([]);
+  const [journyData, setJournyData] = useState<JourneyData[]>([]);
   const [loading, setLoading] = useState(false);
   const [isDriving, setIsDriving] = useState(false);
   const [driverData, setDriverData] = useState<DriverData | null>(null);
@@ -52,7 +52,7 @@ interface JourneyData {
         setDriverData(response.data?.data);
         // setJournyData(response.data.journy);
         setIsDriving(response.data.isDriving);
-        if(response.data?.journeyData?.length > 0){
+        if (response.data?.journeyData?.length > 0) {
           setJournyData(response.data?.journeyData);
         }
         console.log(
@@ -63,7 +63,7 @@ interface JourneyData {
         console.error("Error fetching data in:", error);
         toast.error("Profile not found");
         window.location.href = "/login";
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
@@ -77,18 +77,24 @@ interface JourneyData {
   const formik = useFormik({
     initialValues: {
       vehicleNumber: "",
-      modeOfTransPort: "",
+      modeOfTransport: "",
     },
     validationSchema: Yup.object({
       vehicleNumber: Yup.string()
         .required("Vehicle Number is required")
         .min(4, "Vehicle Number must be at least 4 characters")
         .max(14, "Vehicle Number must be at most 10 characters"),
-      modeOfTransPort: Yup.string().required("Mode of TransPort is required"),
+      modeOfTransport: Yup.string().required("Mode of TransPort is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        console.log(values);
+       
+        handleWithoutPermission({
+          vehicleNumber: values.vehicleNumber,
+          modeOfTransport: values.modeOfTransport,
+          type: "Start",
+          detail: "Starting trip",
+        });
 
         // Example API call
         // const response = await axios.post("http://localhost:8000/login", {
@@ -114,6 +120,291 @@ interface JourneyData {
     const period = hours >= 12 ? "PM" : "AM";
     const hours12 = hours % 12 || 12; // Convert 0 hours to 12
     return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
+
+  interface Location {
+    formattedLocation: string;
+    lat: number;
+    lng: number;
+    detail: string;
+    time: string;
+    date: string;
+  }
+
+  interface HandleWithoutPermissionParams {
+    vehicleNumber?: string;
+    modeOfTransport?: string;
+    type?: "Start" | "Update" | "End";
+    detail: string;
+  }
+
+  const handleWithoutPermission = async ({
+    vehicleNumber,
+    modeOfTransport,
+    type,
+    detail,
+  }: HandleWithoutPermissionParams) => {
+    try {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log("Geolocation position:", position);
+
+            try {
+              const addressData = await getCurrentAddress(latitude, longitude);
+              const formattedLocation =
+                addressData?.results[0]?.formatted || "";
+
+              const now = new Date();
+              const locationData: Location = {
+                formattedLocation,
+                lat: latitude,
+                lng: longitude,
+                detail,
+                time: now.toLocaleTimeString(),
+                date: now.toLocaleDateString(),
+              };
+
+              if (type === "Update") {
+                updateJourney(locationData);
+              } else if (type === "Start") {
+                startJourney({
+                  ...locationData,
+                  vehicleNumber,
+                  modeOfTransport,
+                });
+              } else if (type === "End") {
+                endJourney(locationData);
+              }
+            } catch (error) {
+              console.error("Error fetching address:", error);
+            }
+          },
+          async (error) => {
+            console.error("Geolocation error:", error);
+
+            try {
+              // Fallback to IP-based geolocation
+              const ipAdd = await axios.get("https://ipapi.co/json/");
+              const addressData = await getCurrentAddress(
+                ipAdd.data.latitude,
+                ipAdd.data.longitude
+              );
+              const formattedLocation =
+                addressData?.results[0]?.formatted || "";
+
+              const now = new Date();
+              const locationData: Location = {
+                formattedLocation,
+                lat: ipAdd.data.latitude,
+                lng: ipAdd.data.longitude,
+                detail,
+                time: now.toLocaleTimeString(),
+                date: now.toLocaleDateString(),
+              };
+
+              if (type === "Update") {
+                updateJourney(locationData);
+              } else if (type === "Start") {
+                startJourney({
+                  ...locationData,
+                  vehicleNumber,
+                  modeOfTransport,
+                });
+              } else if (type === "End") {
+                endJourney(locationData);
+              }
+            } catch (ipError) {
+              console.error("Error fetching IP-based geolocation:", ipError);
+            }
+          }
+        );
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+      }
+    } catch (error) {
+      console.error("Error handling without permission:", error);
+    }
+  };
+
+  const startJourney = async ({
+    formattedLocation,
+    lat,
+    lng,
+    vehicleNumber,
+    modeOfTransport,
+    detail,
+  }: Location & HandleWithoutPermissionParams) => {
+    // Check if driverData exists
+    if (!driverData) {
+      toast.error("Driver data not found. Please try again later.");
+      console.error("Driver data is null or undefined.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("/api/journey", {
+        driversId: driverData._id,
+        employeeId: driverData.employeeId,
+        driverName: driverData.name,
+        vehicleNumber: vehicleNumber?.toUpperCase(),
+        modeOfTransPort: modeOfTransport,
+        status: "Drive Started",
+        location: [
+          {
+            formattedLocation,
+            lat,
+            lng,
+            detail: "Drive Started",
+          },
+        ],
+      });
+
+      setIsDriving(true);
+
+      // localStorage.setItem("journeyId", response?.data?.data._id);
+      // Cookies.set("journeyId", response?.data?.data._id);
+      console.log("API response:", response);
+
+      if (response.data.status === true) {
+        toast.success("Journey started successfully.");
+      } else {
+        toast.error("Failed to start journey. Please try again later.");
+      }
+    } catch (error) {
+      toast.error("Failed to start journey. Please try again later.");
+      console.error("Error starting journey:", error);
+    }
+  };
+
+  const updateJourney = async ({
+    formattedLocation,
+    lat,
+    lng,
+    detail,
+  }: Location & { detail: string }) => {
+    const journeyId = localStorage.getItem("journeyId");
+    if (!journeyId) {
+      toast.error("Journey not found. Please try again later.");
+
+      return;
+    }
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/updateJourny/${journeyId}`,
+        {
+          status: detail,
+          location: {
+            formattedLocation,
+            lat,
+            lng,
+            detail,
+          },
+        }
+      );
+
+      console.log("API response:", response);
+
+      if (response.data.status === true) {
+        toast.success("Driving status updated successfully.");
+        const fetchData = async () => {
+          try {
+            const driversId = localStorage.getItem("_id");
+            let url = `http://localhost:8000/getJourneyById`;
+            if (driversId) {
+              url = `http://localhost:8000/getJournyById?driversId=${encodeURIComponent(
+                driversId
+              )}`;
+            }
+            const res = await axios.get(url);
+            setJournyData(res.data.data);
+            if (isDriving) {
+              localStorage.setItem("journeyId", res.data?.data[0]?._id);
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        };
+        fetchData();
+      } else {
+        toast.error("Failed to end journey. Please try again later.");
+      }
+    } catch (error) {
+      toast.error("Failed to end journey. Please try again later.");
+      console.error("Error starting journey:", error);
+    }
+  };
+
+  const endJourney = async ({
+    formattedLocation,
+    lat,
+    lng,
+    detail,
+  }: Location) => {
+    const journeyId = localStorage.getItem("journeyId");
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/endJourny/${journeyId}`,
+        {
+          status: "Ended",
+          location: {
+            formattedLocation,
+            lat,
+            lng,
+            detail,
+          },
+          driversId: localStorage.getItem("_id"),
+        }
+      );
+
+      setIsDriving(false);
+
+      localStorage.removeItem("journeyId");
+
+      console.log("API response:", response);
+
+      if (response.data.status === true) {
+        toast.success("Journey ended successfully.");
+      } else {
+        toast.error("Failed to end journey. Please try again later.");
+      }
+    } catch (error) {
+      toast.error("Failed to end journey. Please try again later.");
+      console.error("Error ending journey:", error);
+    }
+  };
+
+  interface GeocodeResponse {
+    results: {
+      formatted: string;
+    }[];
+  }
+
+  const getCurrentAddress = async (
+    lat: number,
+    lng: number
+  ): Promise<GeocodeResponse | null> => {
+    const apiEndpoint = "https://api.opencagedata.com/geocode/v1/json?";
+    const apiKey = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY;
+
+    if (!apiKey) {
+      console.error(
+        "OpenCage API key is missing. Please add it to your .env file."
+      );
+      return null;
+    }
+
+    const url = `${apiEndpoint}key=${apiKey}&q=${lat},${lng}&pretty=1&no_annotations=1`;
+
+    try {
+      const response = await axios.get<GeocodeResponse>(url);
+      console.log("Geocoding response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return null;
+    }
   };
 
   return (
@@ -193,20 +484,20 @@ interface JourneyData {
                   <div className="relative mb-3">
                     <label
                       className="block mb-2 text-indigo-500 "
-                      htmlFor="modeOfTransPort"
+                      htmlFor="modeOfTransport"
                     >
                       Transportation Method*
                     </label>
                     <select
                       className={`appearance-none w-full py-2.5 leading-tight focus:outline-none focus:shadow-outline bg-none border-b-2 text-sm bg-transparent border-b-black ${
-                        formik.touched.modeOfTransPort &&
-                        formik.errors.modeOfTransPort
+                        formik.touched.modeOfTransport &&
+                        formik.errors.modeOfTransport
                           ? "border-red-500 text-red-600"
                           : "text-gray-700"
                       }`}
-                      id="modeOfTransPort"
+                      id="modeOfTransport"
                       required
-                      {...formik.getFieldProps("modeOfTransPort")}
+                      {...formik.getFieldProps("modeOfTransport")}
                     >
                       <option value="" label="Select transportation method" />
                       <option value="Auto" label="Auto" />
@@ -218,10 +509,10 @@ interface JourneyData {
                       <option value="Walk" label="Walk" />
                       <option value="Other" label="Other" />
                     </select>
-                    {formik.touched.modeOfTransPort &&
-                    formik.errors.modeOfTransPort ? (
+                    {formik.touched.modeOfTransport &&
+                    formik.errors.modeOfTransport ? (
                       <div className="mt-1 text-sm text-red-500">
-                        {formik.errors.modeOfTransPort}
+                        {formik.errors.modeOfTransport}
                       </div>
                     ) : null}
                   </div>
@@ -264,47 +555,17 @@ interface JourneyData {
                 </p>
                 {/* {journyData[0]?.status === "Picked up" ||
                 journyData[0]?.status === "Dropped" ? ( */}
-                <div className="fixed left-0 z-10 flex justify-center w-full gap-4 px-4 bottom-4">
-                  <button
-                    type="button"
-                    // onClick={() =>
-                    //   handleWithoutPermission({
-                    //     type: "End",
-                    //     detail: "Drive Ended",
-                    //   })
-                    // }
-                    className={`w-full h-full p-3 text-white bg-red-500 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
-                  >
-                    End Drive
-                  </button>
-                </div>
-                {/* ) : ( */}
-                <div className="fixed left-0 z-10 flex justify-center w-full gap-4 px-4 bottom-4">
-                  <button
-                    type="button"
-                    // onClick={() =>
-                    // handleWithoutPermission({
-                    //   type: "Update",
-                    //   detail: "Picked up",
-                    // })
-                    // }
-                    className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
-                  >
-                    Picked up
-                  </button>
-                  <button
-                    type="button"
-                    // onClick={() =>
-                    // handleWithoutPermission({
-                    //   type: "Update",
-                    //   detail: "Dropped",
-                    // })
-                    // }
-                    className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
-                  >
-                    Dropped
-                  </button>
-                </div>
+              
+
+
+
+
+
+
+
+
+
+
                 {/* )} */}
               </>
             )}

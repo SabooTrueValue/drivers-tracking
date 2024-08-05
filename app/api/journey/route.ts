@@ -30,6 +30,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     //check if user exists
     let saveData = await Journey.create(data);
+    console.log(saveData);
     let saveDriver = await Driver.updateOne(
       { _id: driverId },
       { $set: { isDriving: true } },
@@ -43,10 +44,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     //check if password is correct
 
     return NextResponse.json({
-      status: "success",
-
-      message: "Login successful",
-    });
+      status: true,
+      data: saveData,
+      message: "Journey created successfully",
+    }, { status: 201 });
   } catch (err: any) {
     console.error(err.message);
     return NextResponse.json({ message: err.message }, { status: 500 });
