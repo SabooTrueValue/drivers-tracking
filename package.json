@@ -10,6 +10,11 @@
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.6",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^5.16.6",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@mui/x-data-grid": "^7.11.1",
     "axios": "^1.7.3",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",

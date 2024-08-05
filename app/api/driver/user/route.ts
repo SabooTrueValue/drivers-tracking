@@ -4,6 +4,59 @@ import mongoose from "mongoose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Journey from "@/models/modelJourny";
+import bcrypt from "bcryptjs";
+
+export async function POST(req: NextRequest) {
+  try {
+    await connectDB();
+    const reqBody = await req.json();
+    const { phone, employeeId } = reqBody;
+    console.log(reqBody);
+    if (!phone) {
+      return NextResponse.json(
+        { message: "Phone number is missing" },
+        // { message: "Reqired fields are missing" },
+        { status: 400 }
+      );
+    } else {
+      const phoneExist = await Driver.findOne({ phone });
+      if (phoneExist)
+        return NextResponse.json(
+          { message: "Phone number is already used" },
+          // { message: "Reqired fields are missing" },
+          { status: 400 }
+        );
+    }
+    if (employeeId) {
+      const employeeIdExist = await Driver.findOne({
+        employeeId,
+      });
+      if (employeeIdExist)
+        return NextResponse.json(
+          { message: "EmployeeId already exists" },
+          // { message: "Reqired fields are missing" },
+          { status: 400 }
+        );
+    }
+    const encryptPass = await bcrypt.hash(reqBody.password, 10);
+    reqBody.password = encryptPass;
+
+    let saveData = await Driver.create(reqBody);
+
+    // Return users with success status
+    return NextResponse.json(
+      { data: saveData, message: "success" },
+      { status: 201 }
+    );
+  } catch (error) {
+    // Handle any errors that occur during database query or processing
+    console.error("Error in GET request:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,14 +86,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "No users found" }, { status: 404 });
     }
 
-    const journeyData = await Journey.find({driversId: driverId }).sort({
+    const journeyData = await Journey.find({ driversId: driverId }).sort({
       createdAt: -1,
     });
 
-    console.log(journeyData)
+    console.log(journeyData);
 
     // Return users with success status
-    return NextResponse.json({ data,journeyData, message: "success" }, { status: 200 });
+    return NextResponse.json(
+      { data, journeyData, message: "success" },
+      { status: 200 }
+    );
   } catch (error) {
     // Handle any errors that occur during database query or processing
     console.error("Error in GET request:", error);

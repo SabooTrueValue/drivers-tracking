@@ -1,5 +1,6 @@
 import { connectDB } from "@/dbConfig/dbConfig";
 import Driver from "@/models/driverModel";
+import Admin from "@/models/modelAdmin";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -20,8 +21,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     //check if user exists
-    const userData = await Driver.findOne({ phone });
+    let userData = await Driver.findOne({ phone });
+    let admin = false;
 
+    if (!userData) {
+      userData = await Admin.findOne({ phone });
+      admin = true;
+      console.log(userData);
+    }
     if (!userData) {
       return NextResponse.json(
         { message: "Invalid credentials " },
@@ -55,14 +62,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const cookieString2 = `_id=${userData._id}; expires = ${expireDuration}; path=/;`;
 
     const newHeader = new Headers(res.headers);
-    newHeader.set("set-cookie", cookieString);
-
     newHeader.append("set-cookie", cookieString2);
+    newHeader.set("set-cookie", cookieString);
+    if (admin) {
+      const cookieString3 = `isAdmin=${admin}; expires = ${expireDuration}; path=/;`;
+      newHeader.append("set-cookie", cookieString3);
+    }
 
     return NextResponse.json(
       {
         status: "success",
         data: userData,
+        isAdmin: admin,
         message: "Login successful",
       },
       {

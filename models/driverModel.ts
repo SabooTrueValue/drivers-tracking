@@ -10,9 +10,9 @@ const driversSchema = {
   },
   employeeId: {
     type: String,
-    required: true,
     unique: true,
     trim: true,
+    default:'NA'
   },
 
   phone: {
