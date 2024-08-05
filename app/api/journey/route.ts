@@ -20,7 +20,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const date = moment().format("DD/MM/YYYY");
     const time = moment().format("HH:mm:ss");
-
+    if (!data.employeeId) {
+      return NextResponse.json(
+        { message: "EmployeeId is missing" },
+        { status: 400 }
+      );
+    }
     data.date = date;
     data.time = time;
     data.location[0].time = time;

@@ -41,6 +41,7 @@ const journeySchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      default:'NA'
     },
     driverName: {
       type: String,

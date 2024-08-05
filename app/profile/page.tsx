@@ -268,7 +268,7 @@ const Home: React.FC = () => {
         isDriving: true,
       });
 
-      // setIsDriving(true);
+      setIsDriving(true);
 
       // localStorage.setItem("journeyId", response?.data?.data._id);
 

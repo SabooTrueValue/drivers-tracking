@@ -62,8 +62,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const cookieString2 = `_id=${userData._id}; expires = ${expireDuration}; path=/;`;
 
     const newHeader = new Headers(res.headers);
-    newHeader.append("set-cookie", cookieString2);
     newHeader.set("set-cookie", cookieString);
+    newHeader.append("set-cookie", cookieString2);
     if (admin) {
       const cookieString3 = `isAdmin=${admin}; expires = ${expireDuration}; path=/;`;
       newHeader.append("set-cookie", cookieString3);
