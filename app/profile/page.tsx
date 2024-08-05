@@ -482,7 +482,7 @@ const Home: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between pt-4">
-                    {!loading && driverData && (
+                    { driverData && (
                       <button
                         className="w-full h-full p-4 text-white bg-green-600 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg text-center"
                         type="submit"
@@ -519,7 +519,7 @@ const Home: React.FC = () => {
                 </p>
                 {journyData[0]?.status === "Picked up" ||
                 journyData[0]?.status === "Dropped" ? (
-                  <div className=" z-10 flex justify-center w-full gap-4 px-4 bottom-4">
+                  <div className=" z-10 flex  w-full gap-4 px-4 bottom-4">
                     <button
                       type="button"
                       onClick={() =>
@@ -534,7 +534,7 @@ const Home: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className=" flex justify-between w-full gap-4 px-4 bottom-4">
+                  <div className=" flex  w-full gap-4 px-4 bottom-4">
                     <button
                       type="button"
                       onClick={() =>

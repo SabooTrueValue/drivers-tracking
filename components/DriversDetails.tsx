@@ -25,7 +25,7 @@ const DriversDetails: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/listDriverData");
+        const res = await axios.get('/api/admin');
         const driverData: DriverData[] = res.data.data.map(
           (item: any, index: number) => ({
             ...item,

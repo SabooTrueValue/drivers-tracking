@@ -37,11 +37,11 @@ const handleSubmit = async (
 ) => {
   try {
     // Example API call
-    const response = await axios.post("/api/admin", {
+    const response = await axios.post("/api/driver/user", {
       name: values.name,
       phone: values.phone,
       password: values.password,
-      employeeId: values.employeeId,
+      employeeId: values.employeeId ? values.employeeId : "NA",
       isVerified: true,
     });
 
@@ -63,7 +63,7 @@ const AddNewDriver: React.FC<AddNewDriverProps> = ({
   showAddUserForm,
   setShowAddUserForm,
 }) => {
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="h-full p-2 bg-white rounded-lg md:mt-4">
       <p className="mb-4 text-lg md:text-xl lg:text-2xl">Add New Driver</p>

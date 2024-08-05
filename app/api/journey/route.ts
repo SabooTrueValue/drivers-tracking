@@ -2,6 +2,8 @@ import { connectDB } from "@/dbConfig/dbConfig";
 import Driver from "@/models/driverModel";
 import Journey from "@/models/modelJourny";
 import moment from "moment";
+import "moment-timezone";
+moment.tz.setDefault("Asia/Kolkata");
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -32,6 +34,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     data.location[0].date = date;
 
     const driverId = cookies().get("_id")?.value;
+    
 
     //check if user exists
     let saveData = await Journey.create(data);

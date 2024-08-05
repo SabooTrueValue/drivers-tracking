@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import Driver from "@/models/driverModel";
 
 export async function POST(req: NextRequest) {
   try {
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Query database for users based on filter
-    const data = await Admin.findOne(filter).sort({ createdAt: -1 });
+    const data = await Driver.find().sort({ createdAt: -1 });
 
     // Check if users are found
     if (!data || data.length === 0) {
