@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import Image from "next/image";
 // import { useRouter } from "next/navigation";
+import { useAppContext } from "@/context";
 
 interface Values {
   phone: string;
@@ -16,6 +17,7 @@ interface Values {
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   //   const router = useRouter();
+  const { setDriverData, journeyData } = useAppContext();
   const formik = useFormik<Values>({
     initialValues: {
       phone: "",
@@ -50,7 +52,8 @@ const Login: React.FC = () => {
         if (res.status === "success") {
           toast.success("Login successful");
           //   cookies().set("token", response.data.token, { expires: 7 }); // Expires in 7 days
-
+          setDriverData(res.data);
+          journeyData();
           console.log(res);
 
           resetForm();

@@ -97,6 +97,7 @@ const Home: React.FC = () => {
     type,
     detail,
   }: HandleWithoutPermissionParams) => {
+    setLoading(true);
     try {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -180,6 +181,8 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error("Error handling without permission:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,6 +223,9 @@ const Home: React.FC = () => {
         ...driverData,
         isDriving: true,
       });
+
+      // getDriverData();
+      journeyData();
 
       setIsDriving(true);
 
@@ -416,11 +422,15 @@ const Home: React.FC = () => {
                   <div className="flex items-center justify-between pt-4">
                     {driverData && (
                       <button
-                        className="w-full h-full p-4 text-white bg-green-600 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg text-center"
+                        className={`w-full h-full p-4 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto text-lg text-center ${
+                          loading
+                            ? "bg-gray-400 cursor-not-allowed "
+                            : "bg-green-600 shadow-xl"
+                        }`}
                         type="submit"
-                        disabled={formik.isSubmitting}
+                        disabled={formik.isSubmitting || loading}
                       >
-                        {formik.isSubmitting
+                        {formik.isSubmitting || loading
                           ? "Starting..."
                           : " Start Drive Now"}
                       </button>
@@ -454,42 +464,57 @@ const Home: React.FC = () => {
                   <div className=" z-10 flex  w-full gap-4 px-4 bottom-4">
                     <button
                       type="button"
+                      disabled={loading}
                       onClick={() =>
                         handleWithoutPermission({
                           type: "Update",
                           detail: "Drive Ended",
                         })
                       }
-                      className={`w-full h-full p-3 text-white bg-red-500 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto text-lg  ${
+                        loading
+                          ? "bg-gray-400 cursor-not-allowed "
+                          : "bg-red-500 shadow-xl"
+                      }`}
                     >
-                      End Drive
+                      {loading ? "Ending..." : "Drive Ended"}
                     </button>
                   </div>
                 ) : (
                   <div className=" flex  w-full gap-4 px-4 bottom-4">
                     <button
                       type="button"
+                      disabled={loading}
                       onClick={() =>
                         handleWithoutPermission({
                           type: "Update",
                           detail: "Picked up",
                         })
                       }
-                      className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto  ${
+                        loading
+                          ? "bg-gray-400 cursor-not-allowed "
+                          : "bg-[#6C63FF] shadow-xl"
+                      } text-lg`}
                     >
-                      Picked up
+                      {loading ? "Picking..." : "Picked up"}
                     </button>
                     <button
                       type="button"
+                      disabled={loading}
                       onClick={() =>
                         handleWithoutPermission({
                           type: "Update",
                           detail: "Dropped",
                         })
                       }
-                      className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto  ${
+                        loading
+                          ? "bg-gray-400 cursor-not-allowed "
+                          : "bg-[#6C63FF] shadow-xl"
+                      } text-lg`}
                     >
-                      Dropped
+                      {loading ? "Dropping..." : "Dropped"}
                     </button>
                   </div>
                 )}
