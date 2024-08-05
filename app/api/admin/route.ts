@@ -6,9 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import Driver from "@/models/driverModel";
 
+connectDB();
+
 export async function POST(req: NextRequest) {
   try {
-    await connectDB();
+  
     const reqBody = await req.json();
     const { phone, employeeId } = reqBody;
     console.log(reqBody);
@@ -66,7 +68,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    await connectDB();
+  
 
     interface Values {
       _id?: string | mongoose.Types.ObjectId;

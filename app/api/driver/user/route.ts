@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Journey from "@/models/modelJourny";
 import bcrypt from "bcryptjs";
 
+connectDB();
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
