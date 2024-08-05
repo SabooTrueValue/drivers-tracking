@@ -32,6 +32,7 @@ const Home: React.FC = () => {
     vehicleNumber: string;
     date: string;
     time: string;
+    status: string;
     location: Location[];
     createdAt: Date;
     updatedAt: Date;
@@ -88,7 +89,6 @@ const Home: React.FC = () => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-       
         handleWithoutPermission({
           vehicleNumber: values.vehicleNumber,
           modeOfTransport: values.modeOfTransport,
@@ -174,9 +174,10 @@ const Home: React.FC = () => {
                   vehicleNumber,
                   modeOfTransport,
                 });
-              } else if (type === "End") {
-                endJourney(locationData);
               }
+              //  else if (type === "End") {
+              //   endJourney(locationData);
+              // }
             } catch (error) {
               console.error("Error fetching address:", error);
             }
@@ -212,9 +213,10 @@ const Home: React.FC = () => {
                   vehicleNumber,
                   modeOfTransport,
                 });
-              } else if (type === "End") {
-                endJourney(locationData);
               }
+              // else if (type === "End") {
+              //   endJourney(locationData);
+              // }
             } catch (ipError) {
               console.error("Error fetching IP-based geolocation:", ipError);
             }
@@ -261,10 +263,15 @@ const Home: React.FC = () => {
         ],
       });
 
-      setIsDriving(true);
+      setDriverData({
+        ...driverData,
+        isDriving: true,
+      });
+
+      // setIsDriving(true);
 
       // localStorage.setItem("journeyId", response?.data?.data._id);
-      // Cookies.set("journeyId", response?.data?.data._id);
+
       console.log("API response:", response);
 
       if (response.data.status === true) {
@@ -284,94 +291,51 @@ const Home: React.FC = () => {
     lng,
     detail,
   }: Location & { detail: string }) => {
-    const journeyId = localStorage.getItem("journeyId");
-    if (!journeyId) {
-      toast.error("Journey not found. Please try again later.");
-
-      return;
-    }
     try {
-      const response = await axios.put(
-        `http://localhost:8000/updateJourny/${journeyId}`,
-        {
-          status: detail,
-          location: {
-            formattedLocation,
-            lat,
-            lng,
-            detail,
-          },
-        }
-      );
+      const response = await axios.put(`/api/journey`, {
+        status: detail,
+        location: {
+          formattedLocation,
+          lat,
+          lng,
+          detail,
+        },
+      });
 
       console.log("API response:", response);
 
       if (response.data.status === true) {
         toast.success("Driving status updated successfully.");
-        const fetchData = async () => {
+        const getDriverData = async () => {
           try {
-            const driversId = localStorage.getItem("_id");
-            let url = `http://localhost:8000/getJourneyById`;
-            if (driversId) {
-              url = `http://localhost:8000/getJournyById?driversId=${encodeURIComponent(
-                driversId
-              )}`;
+            setLoading(true);
+            const response = await axios.get(`/api/driver/user`);
+            console.log(response.data?.data);
+            setDriverData(response.data?.data);
+            // setJournyData(response.data.journy);
+            setIsDriving(response.data.isDriving);
+            if (response.data?.journeyData?.length > 0) {
+              setJournyData(response.data?.journeyData);
             }
-            const res = await axios.get(url);
-            setJournyData(res.data.data);
-            if (isDriving) {
-              localStorage.setItem("journeyId", res.data?.data[0]?._id);
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
+            console.log(
+              "🚀 ~ file: page.tsx:Home ~ getDriverData ~ response.data:",
+              response.data
+            );
+          } catch (error: any) {
+            console.error("Error fetching data in:", error);
+            toast.error("Profile not found");
+            window.location.href = "/login";
+          } finally {
+            setLoading(false);
           }
         };
-        fetchData();
+        getDriverData();
       } else {
         toast.error("Failed to end journey. Please try again later.");
       }
     } catch (error) {
       toast.error("Failed to end journey. Please try again later.");
       console.error("Error starting journey:", error);
-    }
-  };
-
-  const endJourney = async ({
-    formattedLocation,
-    lat,
-    lng,
-    detail,
-  }: Location) => {
-    const journeyId = localStorage.getItem("journeyId");
-    try {
-      const response = await axios.put(
-        `http://localhost:8000/endJourny/${journeyId}`,
-        {
-          status: "Ended",
-          location: {
-            formattedLocation,
-            lat,
-            lng,
-            detail,
-          },
-          driversId: localStorage.getItem("_id"),
-        }
-      );
-
-      setIsDriving(false);
-
-      localStorage.removeItem("journeyId");
-
-      console.log("API response:", response);
-
-      if (response.data.status === true) {
-        toast.success("Journey ended successfully.");
-      } else {
-        toast.error("Failed to end journey. Please try again later.");
-      }
-    } catch (error) {
-      toast.error("Failed to end journey. Please try again later.");
-      console.error("Error ending journey:", error);
     }
   };
 
@@ -468,8 +432,8 @@ const Home: React.FC = () => {
                       id="vehicleNumber"
                       type="text"
                       required
-                      // maxLength={14}
-                      // minLength={4}
+                      maxLength={14}
+                      minLength={4}
                       autoComplete="off"
                       {...formik.getFieldProps("vehicleNumber")}
                       placeholder="Enter pickup or drop vehicle number"
@@ -518,9 +482,9 @@ const Home: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between pt-4">
-                    {!loading && (
+                    {!loading && driverData && (
                       <button
-                        className="w-full h-full p-4 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg text-center"
+                        className="w-full h-full p-4 text-white bg-green-600 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg text-center"
                         type="submit"
                         disabled={formik.isSubmitting}
                       >
@@ -547,26 +511,56 @@ const Home: React.FC = () => {
                 <p className="pb-2 text-2xl text-indigo-500">
                   Ongoing Drive for
                 </p>
-                {/* <p className="pb-2 text-2xl ">{journyData[0]?.vehicleNumber}</p> */}
+                <p className="pb-2 text-2xl ">{journyData[0]?.vehicleNumber}</p>
                 {/* Mode of Transport: {journyData[0]?.modeOfTransPort} */}
                 <p className="pb-6 text-xs ">
                   Once reached to the destination, please click dropped button
                   or picked button to update status.
                 </p>
-                {/* {journyData[0]?.status === "Picked up" ||
-                journyData[0]?.status === "Dropped" ? ( */}
-              
-
-
-
-
-
-
-
-
-
-
-                {/* )} */}
+                {journyData[0]?.status === "Picked up" ||
+                journyData[0]?.status === "Dropped" ? (
+                  <div className=" z-10 flex justify-center w-full gap-4 px-4 bottom-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleWithoutPermission({
+                          type: "Update",
+                          detail: "Drive Ended",
+                        })
+                      }
+                      className={`w-full h-full p-3 text-white bg-red-500 rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                    >
+                      End Drive
+                    </button>
+                  </div>
+                ) : (
+                  <div className=" flex justify-between w-full gap-4 px-4 bottom-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleWithoutPermission({
+                          type: "Update",
+                          detail: "Picked up",
+                        })
+                      }
+                      className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                    >
+                      Picked up
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleWithoutPermission({
+                          type: "Update",
+                          detail: "Dropped",
+                        })
+                      }
+                      className={`w-full h-full p-3 text-white bg-[#6C63FF] rounded-lg shadow-xl shadow-black/50 max-w-md mx-auto text-lg`}
+                    >
+                      Dropped
+                    </button>
+                  </div>
+                )}
               </>
             )}
 

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (!userData) {
       return NextResponse.json(
-        { message: "Invalid credentials" },
+        { message: "Invalid credentials " },
         { status: 400 }
       );
     }
@@ -66,6 +66,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         message: "Login successful",
       },
       {
+        status: 200,
         headers: newHeader,
       }
     );
