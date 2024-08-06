@@ -3,7 +3,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 // import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import { AiOutlineLogout } from "react-icons/ai";
+import { AiOutlineLogout, AiOutlineMenu } from "react-icons/ai";
+import { CgMenuGridR } from "react-icons/cg";
 
 // Define props interface for MenuItem component
 interface MenuItemProps {
@@ -71,26 +72,26 @@ const SidePanel: React.FC<SidePanelProps> = ({
   setSelectedItem,
   menuItems,
 }) => {
-  const [screenSize, setScreenSize] = useState<number | undefined>(undefined);
-  // const router = useRouter(); // Use useRouter hook from Next.js
+  // const [screenSize, setScreenSize] = useState<number | undefined>(undefined);
+  // // const router = useRouter(); // Use useRouter hook from Next.js
 
-  // Handle resize event
-  useEffect(() => {
-    const handleResize = () => setScreenSize(window.innerWidth);
+  // // Handle resize event
+  // useEffect(() => {
+  //   const handleResize = () => setScreenSize(window.innerWidth);
 
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  //   window.addEventListener("resize", handleResize);
+  //   handleResize();
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
-  // Update open state based on screen size
-  useEffect(() => {
-    if (screenSize && screenSize <= 1400) {
-      setOpen(false);
-    } else {
-      setOpen(true);
-    }
-  }, [screenSize, setOpen]);
+  // // Update open state based on screen size
+  // useEffect(() => {
+  //   if (screenSize && screenSize <= 1400) {
+  //     setOpen(false);
+  //   } else {
+  //     setOpen(true);
+  //   }
+  // }, [screenSize, setOpen]);
 
   // Handle logout action
   const handleLogout = () => {
@@ -103,12 +104,15 @@ const SidePanel: React.FC<SidePanelProps> = ({
   return (
     <div className="flex h-screen">
       <div
-        className={`absolute h-screen bg-white duration-500 md:hidden min-w-60 shadow ${
+        className={`absolute h-screen bg-white duration-500 md:hidden min-w-60  ${
           open ? "left-0" : "-left-[100%]"
         } flex flex-col justify-between`}
       >
         <div>
-          <div onClick={() => setOpen(false)} className="mt-2 mb-6 border-b py-4 px-2 text-right ">
+          <div
+            onClick={() => setOpen(false)}
+            className="mt-2 mb-6 border-b py-4 px-2 text-right "
+          >
             {/* Replace with Next.js Link */}
             Close
           </div>
@@ -130,22 +134,17 @@ const SidePanel: React.FC<SidePanelProps> = ({
       <div
         className={`hidden md:block ${
           open ? "min-w-[250px]" : "w-20"
-        } justify-between bg-gray-100 duration-500 border-r shadow-lg`}
+        } justify-between bg-gray-100  `}
       >
         <div className="flex flex-col justify-between h-full">
           <div>
-            <div className="px-2 mt-6 mb-4 font-semibold text-gray-400">
-              {/* Replace with Next.js Link */}
-              {
-                open ? (
-                  'Admin Dashboard'
-                ) : (
-                  'Admin'
-                )
-              }
-              {/* Admin Dashboard */}
+            <div className=" mx-2 mb-2 flex cursor-pointer gap-2 rounded-xl p-2  duration-75 lg:mb-2    text-sm md:text-base    items-center ">
+              <CgMenuGridR
+                className="hidden text-4xl cursor-pointer md:block text-blue-800"
+                onClick={() => setOpen(!open)}
+              />
             </div>
-            <div>
+            <div className="">
               {menuItems.map((item) => (
                 <MenuItem
                   key={item.label}

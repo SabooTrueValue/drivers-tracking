@@ -5,7 +5,8 @@ export async function middleware(req: NextRequest) {
   const cookie = req.cookies.get("token");
   console.log(req.url);
   console.log(cookie)
-  if (!cookie && req.url.includes("/profile") ) {
+ if (!cookie && (req.url.includes("/profile") || req.url.includes("/admin"))) {
    return NextResponse.redirect(new URL("/login", req.url).toString(), 303);
-  }
+ }
+
 }
