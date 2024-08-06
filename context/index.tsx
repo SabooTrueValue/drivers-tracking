@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -37,13 +37,16 @@ export function AppWrapper({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [driverData, setDriverData] = useState<DriverData[]>([]);
+  const [driverData, setDriverData] = useState<DriverData | null>(null);
   const [journyData, setJournyData] = useState<JourneyData[]>([]);
   const [isDriving, setIsDriving] = useState(false);
   useEffect(() => {
     getDriverData();
     journeyData();
   }, []);
+
+
+
   const getDriverData = async () => {
     try {
       const response = await axios.get(`/api/driver/user`);
@@ -51,9 +54,9 @@ export function AppWrapper({
       setDriverData(response.data?.data);
       // setJournyData(response.data.journy);
       setIsDriving(response.data.isDriving);
-    //   if (response.data?.journeyData?.length > 0) {
-    //     setJournyData(response.data?.journeyData);
-    //   }
+      //   if (response.data?.journeyData?.length > 0) {
+      //     setJournyData(response.data?.journeyData);
+      //   }
       console.log(
         "🚀 ~ file: page.tsx:Home ~ getDriverData ~ response.data:",
         response.data
@@ -67,12 +70,12 @@ export function AppWrapper({
   const journeyData = async () => {
     try {
       const response = await axios.get(`/api/journey`);
-     
+
       if (response.data?.data?.length > 0) {
         setJournyData(response.data?.data);
       }
       console.log(
-        "🚀 ~ file: page.tsx:Home ~ getDriverData ~ response.data:",
+        "🚀 ~ file: page.tsx:Home ~ getJourneyData ~ response.data:",
         response.data
       );
     } catch (error: any) {

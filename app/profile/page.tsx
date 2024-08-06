@@ -8,15 +8,17 @@ import axios from "axios";
 import { IoIosLogOut } from "react-icons/io";
 import Cookies from "js-cookie";
 import { useAppContext } from "@/context";
+import { TbLoader3 } from "react-icons/tb";
 
 const Home: React.FC = () => {
   // const { driverData, setDriverData } = useData();
   const [loading, setLoading] = useState(false);
+  const [isPickup, setIsPickup] = useState("");
   const {
     driverData,
     setDriverData,
     journyData,
-    setJournyData,
+    // setJournyData,
     isDriving,
     setIsDriving,
     getDriverData,
@@ -25,7 +27,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     setIsDriving(driverData?.isDriving ?? false);
-  }, [driverData]);
+  }, [setIsDriving, driverData]);
 
   const formik = useFormik({
     initialValues: {
@@ -104,7 +106,13 @@ const Home: React.FC = () => {
           async (position) => {
             const { latitude, longitude } = position.coords;
             console.log("Geolocation position:", position);
-
+            if (detail === "Dropped") {
+              setIsPickup("Dropped");
+            } else if (detail === "Picked up") {
+              setIsPickup("Picked up");
+            } else {
+              setIsPickup("");
+            }
             try {
               const addressData = await getCurrentAddress(latitude, longitude);
               const formattedLocation =
@@ -195,9 +203,12 @@ const Home: React.FC = () => {
     detail,
   }: Location & HandleWithoutPermissionParams) => {
     // Check if driverData exists
+    setLoading(true);
     if (!driverData) {
       toast.error("Driver data not found. Please try again later.");
       console.error("Driver data is null or undefined.");
+
+      window.location.href = "/login";
       return;
     }
 
@@ -241,6 +252,8 @@ const Home: React.FC = () => {
     } catch (error) {
       toast.error("Failed to start journey. Please try again later.");
       console.error("Error starting journey:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -250,7 +263,11 @@ const Home: React.FC = () => {
     lng,
     detail,
   }: Location & { detail: string }) => {
+    setLoading(true);
+    console.log(detail);
     try {
+      // console.log(journyData[0]?._id);
+
       const response = await axios.put(`/api/journey`, {
         status: detail,
         location: {
@@ -259,6 +276,7 @@ const Home: React.FC = () => {
           lng,
           detail,
         },
+        journeyId: journyData[0]?._id,
       });
 
       console.log("API response:", response);
@@ -274,6 +292,8 @@ const Home: React.FC = () => {
     } catch (error) {
       toast.error("Failed to end journey. Please try again later.");
       console.error("Error starting journey:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -287,6 +307,7 @@ const Home: React.FC = () => {
     lat: number,
     lng: number
   ): Promise<GeocodeResponse | null> => {
+    setLoading(true);
     const apiEndpoint = "https://api.opencagedata.com/geocode/v1/json?";
     const apiKey = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY;
 
@@ -306,6 +327,8 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error fetching address:", error);
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -430,9 +453,18 @@ const Home: React.FC = () => {
                         type="submit"
                         disabled={formik.isSubmitting || loading}
                       >
-                        {formik.isSubmitting || loading
-                          ? "Starting..."
-                          : " Start Drive Now"}
+                        {formik.isSubmitting || loading ? (
+                          <p className="flex items-center justify-center gap-2">
+                            <span className="">Starting.. </span>
+                            <TbLoader3
+                              color="white"
+                              size={30}
+                              className=" animate-spin"
+                            />
+                          </p>
+                        ) : (
+                          " Start Drive Now"
+                        )}
                       </button>
                     )}
                   </div>
@@ -477,7 +509,18 @@ const Home: React.FC = () => {
                           : "bg-red-500 shadow-xl"
                       }`}
                     >
-                      {loading ? "Ending..." : "Drive Ended"}
+                      {loading ? (
+                        <p className="flex items-center justify-center gap-2">
+                          <span className="">Ending.. </span>
+                          <TbLoader3
+                            color="white"
+                            size={30}
+                            className=" animate-spin"
+                          />
+                        </p>
+                      ) : (
+                        "Drive Ended"
+                      )}
                     </button>
                   </div>
                 ) : (
@@ -491,14 +534,28 @@ const Home: React.FC = () => {
                           detail: "Picked up",
                         })
                       }
-                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto  ${
+                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto ${
+                        isPickup === "Dropped" ? "hidden" : "inline-block"
+                      } ${
                         loading
                           ? "bg-gray-400 cursor-not-allowed "
                           : "bg-[#6C63FF] shadow-xl"
                       } text-lg`}
                     >
-                      {loading ? "Picking..." : "Picked up"}
+                      {loading ? (
+                        <p className="flex items-center justify-center gap-2">
+                          <span className="">Picking up.. </span>
+                          <TbLoader3
+                            color="white"
+                            size={30}
+                            className=" animate-spin"
+                          />
+                        </p>
+                      ) : (
+                        "Picked up"
+                      )}
                     </button>
+
                     <button
                       type="button"
                       disabled={loading}
@@ -508,13 +565,26 @@ const Home: React.FC = () => {
                           detail: "Dropped",
                         })
                       }
-                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto  ${
+                      className={`w-full h-full p-3 text-white  rounded-lg  shadow-black/50 max-w-md mx-auto ${
+                        isPickup === "Picked up" ? "hidden" : "inline-block"
+                      }  ${
                         loading
                           ? "bg-gray-400 cursor-not-allowed "
                           : "bg-[#6C63FF] shadow-xl"
                       } text-lg`}
                     >
-                      {loading ? "Dropping..." : "Dropped"}
+                      {loading ? (
+                        <p className="flex items-center justify-center gap-2">
+                          <span className="">Dropping.. </span>
+                          <TbLoader3
+                            color="white"
+                            size={30}
+                            className=" animate-spin"
+                          />
+                        </p>
+                      ) : (
+                        "Dropped"
+                      )}
                     </button>
                   </div>
                 )}

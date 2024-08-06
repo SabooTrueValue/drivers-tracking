@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 // import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context";
+import { TbLoader3 } from "react-icons/tb";
 
 interface Values {
   phone: string;
@@ -16,6 +17,7 @@ interface Values {
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
+
   //   const router = useRouter();
   const { setDriverData, journeyData } = useAppContext();
   const formik = useFormik<Values>({
@@ -75,7 +77,9 @@ const Login: React.FC = () => {
 
   return (
     <main className="w-full h-screen bg-[#6C63FF] max-h-screen overflow-hidden">
-      <p className="flex  text-3xl md:text-4xl text-white py-10 px-2">Login</p>
+      <p className="flex  text-3xl md:text-4xl text-white py-10 px-2">
+        Login Page
+      </p>
 
       <div className="w-full h-full px-6 pb-10  pt-20  bg-white rounded-lg rounded-t-3xl lg:flex lg:flex-col lg:justify-center lg:pt-0 ">
         <Image
@@ -150,7 +154,18 @@ const Login: React.FC = () => {
               type="submit"
               disabled={formik.isSubmitting}
             >
-              {formik.isSubmitting ? "Submitting..." : "Login"}
+              {formik.isSubmitting ? (
+                <p className="flex items-center justify-center gap-2">
+                  <span className="">Signing up.. </span>
+                  <TbLoader3
+                    color="white"
+                    size={30}
+                    className=" animate-spin"
+                  />
+                </p>
+              ) : (
+                "Login"
+              )}
             </button>
           </div>
           <p className="pt-4 text-xs text-center">

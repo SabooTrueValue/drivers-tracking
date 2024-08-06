@@ -89,7 +89,16 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     const time = moment().format("HH:mm:ss");
 
     // const driverId = cookies().get("_id")?.value;
-    const journeyId = cookies().get("journeyId")?.value;
+    let journeyId = cookies().get("journeyId")?.value;
+    if (!journeyId) {
+      journeyId = data.journeyId;
+    }
+    if (!journeyId) {
+      return NextResponse.json(
+        { message: "JourneyId is missing" },
+        { status: 400 }
+      );
+    }
 
     // Assuming these are coming from the data object
     const { formattedLocation, lat, lng } = data.location;
