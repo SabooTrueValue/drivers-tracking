@@ -593,7 +593,7 @@ const Home: React.FC = () => {
 
             <div className={`${!isDriving ? " mt-20" : " mt-8  "} pb-20`}>
               <p className="pb-2 text-xl text-indigo-500 ">
-                Todays Drive History
+                 Drive History <span className="text-xs text-gray-500 ">( last 5 )</span>
               </p>
 
               {journyData.length > 0 ? (

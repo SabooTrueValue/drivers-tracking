@@ -191,7 +191,7 @@ export async function GET(req: NextRequest) {
 
     const journeyData = await Journey.find({ driversId: driverId }).sort({
       createdAt: -1,
-    });
+    }).limit(5);
 
     console.log(journeyData);
 
