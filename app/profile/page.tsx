@@ -65,6 +65,9 @@ const Home: React.FC = () => {
   });
   const handleLogout = () => {
     Cookies.remove("token");
+    Cookies.remove("driverId");
+    Cookies.remove("_id");
+    Cookies.remove("journeyId");
     setDriverData(null);
     toast.success("Logout Successfully");
     window.location.href = "/login";
@@ -593,7 +596,7 @@ const Home: React.FC = () => {
 
             <div className={`${!isDriving ? " mt-20" : " mt-8  "} pb-20`}>
               <p className="pb-2 text-xl text-indigo-500 ">
-                 Drive History <span className="text-xs text-gray-500 ">( last 5 )</span>
+                 Drives History <span className="text-xs text-gray-500 ">( last 5 )</span>
               </p>
 
               {journyData.length > 0 ? (

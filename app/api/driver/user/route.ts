@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 // import Journey from "@/models/modelJourny";
 import bcrypt from "bcryptjs";
+import Admin from "@/models/modelAdmin";
 
 connectDB();
 
@@ -81,8 +82,11 @@ export async function GET(req: NextRequest) {
     }
 
     // Query database for users based on filter
-    const data = await Driver.findOne(filter).sort({ createdAt: -1 });
+    let data = await Driver.findOne(filter).sort({ createdAt: -1 });
 
+    if (!data) {
+      data = await Admin.findOne(filter);
+    }
     // Check if users are found
     if (!data || data.length === 0) {
       return NextResponse.json({ message: "No users found" }, { status: 404 });
