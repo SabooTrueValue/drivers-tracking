@@ -45,7 +45,21 @@ export function AppWrapper({
     journeyData();
   }, []);
 
+  useEffect(() => {
+    // Define an asynchronous function inside useEffect
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/active");
+        console.log(response.data);
+        // Handle the response data as needed, e.g., set it to state
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Handle the error appropriately
+      }
+    };
 
+    fetchData(); // Call the async function
+  }, []); // Dependency array
 
   const getDriverData = async () => {
     try {

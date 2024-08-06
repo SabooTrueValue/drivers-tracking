@@ -3,7 +3,7 @@ import Driver from "@/models/driverModel";
 import mongoose from "mongoose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import Journey from "@/models/modelJourny";
+// import Journey from "@/models/modelJourny";
 import bcrypt from "bcryptjs";
 
 connectDB();
