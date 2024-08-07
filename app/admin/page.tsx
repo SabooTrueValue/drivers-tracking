@@ -322,7 +322,7 @@ const Dashboard: React.FC = () => {
   // }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex  bg-gray-100">
       <div className="z-20">
         <SidePanel
           open={open}
@@ -333,7 +333,7 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div className="flex-auto h-screen overflow-x-scroll font-roboto md:overflow-x-hidden relative lg:min-h-screen pt-14">
+      <div className="flex-auto   font-roboto relative  pt-14">
         <div className="absolute left-0 top-0 w-full py-4 text-blue-800 flex justify-between select-none">
           <AiOutlineMenu
             className="cursor-pointer text-3xl md:hidden"
@@ -342,7 +342,7 @@ const Dashboard: React.FC = () => {
           <p className="text-lg">{driverData?.name}</p>
           <p className="hidden md:block text-sm px-4">{driverData?.phone}</p>
         </div>
-        <div className="bg-white rounded-tl-2xl px-2 lg:px-4 pt-6 h-full">
+        <div className="bg-white rounded-tl-2xl px-2 lg:px-4 py-6  ">
           {selectedItem === "Home" ? (
             <AdminHome
               totalDriver={totalDriver}
