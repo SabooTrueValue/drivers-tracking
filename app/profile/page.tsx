@@ -221,7 +221,7 @@ const Home: React.FC = () => {
         employeeId: driverData.employeeId,
         driverName: driverData.name,
         vehicleNumber: vehicleNumber?.toUpperCase(),
-        modeOfTransPort: modeOfTransport,
+        modeOfTransport: modeOfTransport,
         status: "Drive Started",
         location: [
           {
@@ -489,7 +489,7 @@ const Home: React.FC = () => {
                   Ongoing Drive for
                 </p>
                 <p className="pb-2 text-2xl ">{journyData[0]?.vehicleNumber}</p>
-                {/* Mode of Transport: {journyData[0]?.modeOfTransPort} */}
+                {/* Mode of Transport: {journyData[0]?.modeOfTransport} */}
                 <p className="pb-6 text-xs ">
                   Once reached to the destination, please click dropped button
                   or picked button to update status.
@@ -596,7 +596,8 @@ const Home: React.FC = () => {
 
             <div className={`${!isDriving ? " mt-20" : " mt-8  "} pb-20`}>
               <p className="pb-2 text-xl text-indigo-500 ">
-                 Drives History <span className="text-xs text-gray-500 ">( last 5 )</span>
+                Drives History{" "}
+                <span className="text-xs text-gray-500 ">( last 5 )</span>
               </p>
 
               {journyData.length > 0 ? (
@@ -620,7 +621,15 @@ const Home: React.FC = () => {
                       {journey.location.map((loc: any, index: any) => (
                         <div key={index} className="flex gap-1 -mt-1 ">
                           <div className="flex flex-col items-center justify-start w-4 pt-2">
-                            <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                index === 0
+                                  ? "bg-green-500"
+                                  : index === 1
+                                  ? "bg-blue-500"
+                                  : "bg-red-500"
+                              }`}
+                            />
                             {index < 2 && (
                               <div className="w-1 h-full border-r-2 border-r-indigo-500 border-dashed -ml-0.5 " />
                             )}

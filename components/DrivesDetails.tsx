@@ -1,8 +1,13 @@
-
-
-import React, { useEffect, useState } from "react";
-import { Box, IconButton } from "@mui/material";
-import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
+import React from "react";
+import { Box } from "@mui/material";
+import {
+  DataGrid,
+  GridToolbar,
+  GridColDef,
+  useGridApiRef,
+  gridClasses,
+  GridAutosizeOptions,
+} from "@mui/x-data-grid";
 import { IoMdDownload } from "react-icons/io";
 import { ImSpinner2 } from "react-icons/im";
 
@@ -18,55 +23,55 @@ interface DriversDetailsProps {
   columns: GridColDef[];
 }
 
+const autosizeOptions: GridAutosizeOptions = {
+  includeOutliers: true,
+};
+
 const DrivesDetails: React.FC<DriversDetailsProps> = ({
   error,
   loading,
   data,
   columns,
 }) => {
+    const apiRef = useGridApiRef();
+
   return (
-    <Box m="8px 0 0 0">
-      <Box
-        // height="80vh"
-        // height={"calc(100vh - 200px)"}
-        height="auto"
-        border={1}
-        borderColor="grey.300"
-        borderRadius="10px"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "1",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `black`,
-          },
-        }}
-      >
-        {loading ? (
-          <div className="flex items-center justify-center h-full gap-4 text-xl ">
-            <ImSpinner2 className="text-2xl animate-spin " />
-            Wait fetching the data from backend.
-          </div>
-        ) : error ? (
-          <div>Error ~ {error}</div>
-        ) : (
-          <DataGrid
-            rows={data}
-            columns={columns}
-            // slots={{ toolbar: GridToolbar }}
-            // components={{
-            //   Toolbar: CustomToolbar,
-            // }}
-            sx={{
-              backgroundColor: "white",
-              fontSize: 15,
-            }}
-          />
-        )}
-      </Box>
+    <Box
+      height="80vh"
+      overflow={"auto"}
+      border={1}
+      width={"100%"}
+      borderColor="grey.300"
+      // borderRadius="10px"
+    >
+      {loading ? (
+        <div className="flex items-center justify-center h-full gap-4 text-xl ">
+          <ImSpinner2 className="text-2xl animate-spin " />
+          Wait fetching the data from backend.
+        </div>
+      ) : error ? (
+        <div>Error ~ {error}</div>
+      ) : (
+        <DataGrid
+          rows={data}
+          apiRef={apiRef}
+          columns={columns}
+          autosizeOptions={autosizeOptions}
+          getRowHeight={() => "auto"}
+         
+          slots={{ toolbar: GridToolbar }}
+          sx={{
+            [`& .${gridClasses.cell}`]: {
+              py: 0.5,
+            },
+          }}
+          // sx={{
+          //   backgroundColor: "white",
+          //   fontSize: 15,
+          //   overflow: "auto", // Ensure overflow for horizontal scroll
+          // }}
+        />
+      )}
     </Box>
   );
 };

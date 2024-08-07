@@ -25,9 +25,9 @@ const DriversDetails: React.FC<DriversDetailsProps> = ({
   return (
     <Box m="8px 0 0 0">
       <Box
-        // height="80vh"
+        height="80vh"
         // height={"calc(100vh - 200px)"}
-        height="auto"
+        // height="auto"
         border={1}
         borderColor="grey.300"
         borderRadius="10px"
@@ -54,7 +54,7 @@ const DriversDetails: React.FC<DriversDetailsProps> = ({
           <DataGrid
             rows={data}
             columns={columns}
-            // slots={{ toolbar: GridToolbar }}
+            slots={{ toolbar: GridToolbar }}
             // components={{
             //   Toolbar: CustomToolbar,
             // }}

@@ -35,12 +35,12 @@ const DrivesData: React.FC<DriversDetailsProps> = ({
 
   return (
     <div>
-      <div className="flex justify-end gap-2 mt-2 mb-3 text-sm">
+      <div className="flex justify-end gap-2  mb-3 text-sm">
         <button
           type="button"
           onClick={() => setShowGrid(true)}
           aria-label="Grid View"
-          className={`px-4 py-2 rounded-md shadow-sm md:px-6 ${
+          className={`px-4 py-2 rounded-md shadow-sm md:px-6 border ${
             showGrid
               ? "bg-blue-800 text-white"
               : "text-blue-800 hover:bg-blue-700 hover:text-white"
@@ -52,7 +52,7 @@ const DrivesData: React.FC<DriversDetailsProps> = ({
           type="button"
           onClick={() => setShowGrid(false)}
           aria-label="Table View"
-          className={`px-4 py-2 rounded-md shadow-sm md:px-6 ${
+          className={`px-4 py-2 rounded-md shadow-sm md:px-6 border ${
             !showGrid
               ? "bg-blue-800 text-white"
               : "text-blue-800 hover:bg-blue-700 hover:text-white"
@@ -90,21 +90,38 @@ const GridView: React.FC<{ journyData: DriverData[] }> = ({ journyData }) => {
         journyData.map((journey, index) => (
           <div
             key={index}
-            className="max-h-[50vh] p-4 bg-white border rounded-lg shadow-sm shadow-black/50 relative "
+            className={` p-4 bg-white border rounded-lg shadow-sm shadow-black/50 relative ${
+              journey?.location?.length === 2
+                ? " border-indigo-400 "
+                : journey?.location?.length === 1 && " border-green-400"
+            }`}
           >
-            <div className="flex justify-between pt-2  bg-white  md:flex-row">
-              <p className="text-indigo-500">{journey.driverName}</p>
-              <p className="text-sm text-indigo-500">{journey.employeeId}</p>
+            <div className="flex justify-between pt-2    md:flex-row text-sm">
+              <p className="text-indigo-500">
+                {journey.driverName} -{" "}
+                {journey.employeeId && journey.employeeId}
+              </p>
+              <p className="text-xs text-indigo-500">{journey.date}</p>
             </div>
-            <div className="flex justify-between pb-2 mb-5 bg-white border-b md:flex-row">
+            <div className="flex justify-between py-2 mb-5 border-b   md:flex-row">
               <p className="text-indigo-500">{journey.vehicleNumber}</p>
-              <p className="text-sm text-indigo-500">{journey.date}</p>
+              <p className="text-sm text-indigo-500">
+                {journey.modeOfTransport}
+              </p>
             </div>
 
             {journey.location.map((loc, locIndex) => (
               <div key={locIndex} className="flex gap-1 -mt-1">
                 <div className="flex flex-col items-center justify-start w-4 pt-2">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      locIndex === 0
+                        ? "bg-green-500"
+                        : locIndex === 1
+                        ? "bg-blue-500"
+                        : "bg-red-500"
+                    }`}
+                  />
                   {locIndex < 2 && (
                     <div className="w-1 h-full border-r-2 border-r-indigo-500 border-dashed -ml-0.5" />
                   )}
