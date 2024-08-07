@@ -2,7 +2,24 @@ import React, { useState } from "react";
 import AddNewDriver from "./AddNewDriver";
 import DriversDetails from "./DriversDetails";
 
-const DriversData = () => {
+interface DriverData {
+  id: number;
+  [key: string]: any; // Replace with actual fields in your data
+}
+
+interface DriversDetailsProps {
+  error: string;
+  loading: boolean;
+  data: DriverData[];
+  columns: any[];
+}
+
+const DriversData: React.FC<DriversDetailsProps> = ({
+  error,
+  loading,
+  data,
+  columns,
+}) => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   return (
     <div className="">
@@ -31,7 +48,12 @@ const DriversData = () => {
           </button>
         </div>
       )}
-      <DriversDetails />
+      <DriversDetails
+        error={error}
+        loading={loading}
+        columns={columns}
+        data={data}
+      />
     </div>
   );
 };

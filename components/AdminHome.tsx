@@ -9,7 +9,6 @@ import { BarChart } from "@mui/x-charts/BarChart";
 
 import { RiHome2Line, RiPencilFill } from "react-icons/ri";
 // import DriversData from "./DriversData";
-import DriversDetails from "./DriversDetails";
 import { HiPlus } from "react-icons/hi";
 const AdminHome = () => {
   return (
@@ -147,7 +146,7 @@ const BasicBars = () => {
           ],
         },
       ]}
-      series={[{ data: [4, 8, 5, 10, 2, 4, 10], color: "#7c3aed" }]} // Single series with data
+      series={[{ data: [4, 8, 5, 10, 2, 4, 10], color: "#1e40af" }]} // Single series with data
       className="min-w-20 w-full min-h-20  "
       borderRadius={20}
       // height={20}

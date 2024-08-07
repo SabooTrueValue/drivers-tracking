@@ -5,12 +5,12 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import Driver from "@/models/driverModel";
+import JourneyModel from "@/models/modelJourny";
 
 connectDB();
 
 export async function POST(req: NextRequest) {
   try {
-  
     const reqBody = await req.json();
     const { phone, employeeId } = reqBody;
     console.log(reqBody);
@@ -68,8 +68,6 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-  
-
     interface Values {
       _id?: string | mongoose.Types.ObjectId;
       isDeleted: boolean;
@@ -88,6 +86,7 @@ export async function GET(req: NextRequest) {
 
     // Query database for users based on filter
     const data = await Driver.find().sort({ createdAt: -1 });
+    const journeyData = await JourneyModel.find().sort({ createdAt: -1 });
 
     // Check if users are found
     if (!data || data.length === 0) {
@@ -95,7 +94,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Return users with success status
-    return NextResponse.json({ data, message: "success" }, { status: 200 });
+    return NextResponse.json(
+      { data, journeyData, message: "success" },
+      { status: 200 }
+    );
   } catch (error) {
     // Handle any errors that occur during database query or processing
     console.error("Error in GET request:", error);
