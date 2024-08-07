@@ -334,7 +334,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="flex-auto h-screen overflow-x-scroll font-roboto md:overflow-x-hidden relative lg:min-h-screen pt-14">
-        <div className="absolute left-0 top-0 w-full py-4 text-blue-800 flex justify-between">
+        <div className="absolute left-0 top-0 w-full py-4 text-blue-800 flex justify-between select-none">
           <AiOutlineMenu
             className="cursor-pointer text-3xl md:hidden"
             onClick={() => setOpen(!open)}

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineLogout, AiOutlineMenu } from "react-icons/ai";
 import { CgMenuGridR } from "react-icons/cg";
+import Cookies from "js-cookie";
 
 // Define props interface for MenuItem component
 interface MenuItemProps {
@@ -95,7 +96,11 @@ const SidePanel: React.FC<SidePanelProps> = ({
 
   // Handle logout action
   const handleLogout = () => {
-    localStorage.clear();
+    Cookies.remove("token");
+    Cookies.remove("driverId");
+    Cookies.remove("_id");
+    Cookies.remove("journeyId");
+    Cookies.remove("isAdmin");
     toast.success("Logout Successfully");
     window.location.href = "/login";
     // router.push("/login"); // Use router for navigation
