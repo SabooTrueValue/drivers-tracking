@@ -24,7 +24,7 @@ interface DriverData {
 const Dashboard: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState("Home");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [columns, setColumns] = useState<any[]>([]);
   const [columns2, setColumns2] = useState<any[]>([]);
