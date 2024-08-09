@@ -21,11 +21,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     //check if user exists
-    let userData = await Driver.findOne({ phone });
+    let userData = await Driver.findOne({ phone, isDeleted: false });
     let admin = false;
 
     if (!userData) {
-      userData = await Admin.findOne({ phone });
+      userData = await Admin.findOne({ phone, isDeleted: false });
       admin = true;
       console.log(userData);
     }

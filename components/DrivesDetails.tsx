@@ -40,7 +40,7 @@ const DrivesDetails: React.FC<DriversDetailsProps> = ({
       height="80vh"
       overflow={"auto"}
       border={1}
-      width={"100%"}
+      // width={"100%"}
       borderColor="grey.300"
       // borderRadius="10px"
     >

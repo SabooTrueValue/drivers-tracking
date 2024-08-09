@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Query database for users based on filter
-    const data = await Driver.find().sort({ createdAt: -1 });
+    const data = await Driver.find({isDeleted: false}).sort({ createdAt: -1 });
     const journeyData = await JourneyModel.find().sort({ createdAt: -1 });
 
     // Check if users are found
@@ -101,6 +101,42 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     // Handle any errors that occur during database query or processing
     console.error("Error in GET request:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id"); // Extract `id` from query parameters
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: "Invalid or missing ID parameter" },
+        { status: 400 }
+      );
+    }
+
+    // Convert `id` to ObjectId
+    const objectId = new mongoose.Types.ObjectId(id);
+    console.log(objectId);
+
+    const data = await Driver.findByIdAndUpdate(id, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
+
+    if (!data) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ data, message: "success" }, { status: 200 });
+  } catch (error) {
+    // Handle any errors that occur during database query or processing
+    console.error("Error in DELETE request:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

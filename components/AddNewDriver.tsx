@@ -9,6 +9,8 @@ import { VscEye, VscEyeClosed } from "react-icons/vsc";
 interface AddNewDriverProps {
   showAddUserForm: boolean;
   setShowAddUserForm: React.Dispatch<React.SetStateAction<boolean>>;
+  setRefreshing: React.Dispatch<React.SetStateAction<boolean>>;
+  refreshing: boolean;
 }
 
 // Validation Schema
@@ -31,41 +33,50 @@ const validationSchema = Yup.object({
     .matches(/^\d{4}$/, "Employee ID must be a 4-digit number"),
 });
 
-const handleSubmit = async (
-  values: any,
-  { resetForm }: { resetForm: () => void }
-) => {
-  try {
-    // Example API call
-    const response = await axios.post("/api/driver/user", {
-      name: values.name,
-      phone: values.phone,
-      password: values.password,
-      employeeId: values.employeeId ? values.employeeId : "NA",
-      isVerified: true,
-    });
-
-    console.log("API response:", response);
-    if (response.status === 201) {
-      toast.success("Driver added successfully!");
-      resetForm();
-    } else {
-      console.log(response);
-      // toast.error(response.message);
-    }
-  } catch (error: any) {
-    console.error("Error adding driver:", error);
-    toast.error(error.response.data.message || "Error adding driver");
-  }
-};
-
 const AddNewDriver: React.FC<AddNewDriverProps> = ({
   showAddUserForm,
   setShowAddUserForm,
+  refreshing,
+  setRefreshing,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (
+    values: any,
+    { resetForm }: { resetForm: () => void }
+  ) => {
+    try {
+      // Example API call
+      setLoading(true);
+      const response = await axios.post("/api/driver/user", {
+        name: values.name,
+        phone: values.phone,
+        password: values.password,
+        employeeId: values?.employeeId ? values.employeeId : "NA",
+        isVerified: true,
+        totalDrives: 0,
+      });
+
+      console.log("API response:", response);
+      if (response.status === 201) {
+        toast.success("Driver added successfully!");
+        resetForm();
+        setShowAddUserForm(false);
+        setRefreshing(!refreshing);
+      } else {
+        console.log(response);
+        // toast.error(response.message);
+      }
+    } catch (error: any) {
+      console.error("Error adding driver:", error);
+      toast.error(error.response.data.message || "Error adding driver");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <div className="h-full p-2 bg-white rounded-lg md:mt-4">
+    <div className="h-full p-2 bg-white rounded-lg  ">
       <p className="mb-4 text-lg md:text-xl lg:text-2xl">Add New Driver</p>
 
       <Formik
@@ -179,17 +190,19 @@ const AddNewDriver: React.FC<AddNewDriverProps> = ({
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-6">
               <button
                 type="submit"
+                disabled={loading}
                 aria-label="Add Driver"
                 className="px-4 py-2 mt-6 text-white bg-blue-800 rounded-md shadow-sm hover:bg-blue-700 focus:ring-2 md:px-6 lg:px-10"
               >
-                Add Now
+                {loading ? "Adding..." : "Add Driver"}
               </button>
               {showAddUserForm && (
                 <button
                   type="button"
+                  disabled={loading}
                   onClick={() => setShowAddUserForm(false)}
                   aria-label="Cancel"
                   className="px-4 py-2 mt-6 text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 focus:ring-2 md:px-6 lg:px-10"

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log(saveData);
     let saveDriver = await Driver.updateOne(
       { _id: driverId },
-      { $set: { isDriving: true } },
+      { $set: { isDriving: true }, $inc: { totalDrives: 1 } },
       { new: true, upsert: true }
     );
 
@@ -189,9 +189,11 @@ export async function GET(req: NextRequest) {
 
     // Check if users are found
 
-    const journeyData = await Journey.find({ driversId: driverId }).sort({
-      createdAt: -1,
-    }).limit(5);
+    const journeyData = await Journey.find({ driversId: driverId })
+      .sort({
+        createdAt: -1,
+      })
+      .limit(5);
 
     console.log(journeyData);
 

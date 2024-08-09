@@ -109,7 +109,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   return (
     <div className="flex h-screen">
       <div
-        className={`absolute h-screen bg-white duration-500 md:hidden min-w-60  ${
+        className={`fixed h-screen bg-white duration-500 md:hidden min-w-60  ${
           open ? "left-0" : "-left-[100%]"
         } flex flex-col justify-between`}
       >

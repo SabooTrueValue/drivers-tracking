@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
     }
-    if (employeeId) {
+    if (employeeId && employeeId !== "NA") {
       const employeeIdExist = await Driver.findOne({
         employeeId,
       });
@@ -43,6 +43,10 @@ export async function POST(req: NextRequest) {
     }
     const encryptPass = await bcrypt.hash(reqBody.password, 10);
     reqBody.password = encryptPass;
+
+    reqBody.totalDrives = 1;
+    console.log(reqBody);
+
 
     let saveData = await Driver.create(reqBody);
 

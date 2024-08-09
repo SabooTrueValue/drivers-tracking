@@ -10,7 +10,6 @@ const driversSchema = {
   },
   employeeId: {
     type: String,
-    unique: true,
     trim: true,
     default:'NA'
   },
@@ -39,6 +38,11 @@ const driversSchema = {
     default: false,
   },
   lastDrivingTime: String,
+
+  totalDrives: {
+    type: Number,
+    default: 0,
+  },
 
   isDeleted: {
     type: Boolean,

@@ -85,7 +85,7 @@ const GridView: React.FC<{ journyData: DriverData[] }> = ({ journyData }) => {
   };
 
   return (
-    <div className=" gap-4 pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[80vh] overflow-y-scroll px-1">
+    <div className=" gap-4  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[80vh] overflow-y-scroll px-1 py-6">
       {journyData.length > 0 ? (
         journyData.map((journey, index) => (
           <div
